@@ -1,0 +1,88 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>My Location Test</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 480px;
+      margin: 50px auto;
+      padding: 20px;
+      line-height: 1.6;
+    }
+    button {
+      padding: 13px 20px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    #result {
+      overflow-wrap: anywhere;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h2>My Location Test</h2>
+  <p>
+    This page can read your device's location only after
+    you choose to share it and grant browser permission.
+  </p>
+
+  <button id="share">Share my location</button>
+  <div id="result" aria-live="polite"></div>
+
+  <script>
+    const button = document.getElementById("share");
+    const result = document.getElementById("result");
+
+    button.addEventListener("click", () => {
+      if (!navigator.geolocation) {
+        result.textContent =
+          "Location is not supported by this browser.";
+        return;
+      }
+
+      result.textContent = "Requesting location permission...";
+
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const lat = position.coords.latitude;
+          const lon = position.coords.longitude;
+
+          result.replaceChildren();
+
+          const heading = document.createElement("p");
+          heading.textContent = "Location obtained successfully.";
+          result.appendChild(heading);
+
+          const coordinates = document.createElement("p");
+          coordinates.textContent =
+            `Latitude: ${lat}\nLongitude: ${lon}`;
+          result.appendChild(coordinates);
+
+          const map = document.createElement("a");
+          map.href =
+            `https://www.openstreetmap.org/?mlat=${lat}&mlon=${lon}#map=17/${lat}/${lon}`;
+          map.textContent = "View on OpenStreetMap";
+          map.target = "_blank";
+          map.rel = "noopener noreferrer";
+          result.appendChild(map);
+        },
+        (error) => {
+          result.textContent =
+            "Location unavailable. Check permission and try again. " +
+            error.message;
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 15000,
+          maximumAge: 0
+        }
+      );
+    });
+  </script>
+</body>
+</html>
